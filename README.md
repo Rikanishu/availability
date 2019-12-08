@@ -1,4 +1,4 @@
-Assume you have something that can be booked (hotels, meeting rooms, etc.) so you store all date ranges when object is taken in a format `(object_id, date_from, date_to)` to recognize if the object is reserved at this time. 
+Assume you have something that can be booked (hotels, meeting rooms, etc.) so you store all date ranges when object is taken in a format `(object_id, date_from, date_to)` to recognize if the object is reserved for that time. 
 
 Every time you want to check if the object is available in a particular time range, as a worst case you need to select all objects and exclude the object that are taken for this date ranges.
 
