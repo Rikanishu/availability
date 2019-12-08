@@ -77,7 +77,7 @@ func (s *Storage) FindAvail(startTS int64, endTS int64) (out []string) {
 	}
 
 	sNodes := make([]*NodeRangeStart, 0)
-	s.tree.AscendGreaterOrEqual(&NodeRangeStart{
+	s.tree.DescendLessOrEqual(&NodeRangeStart{
 		StartTS: startTS,
 	}, func(item btree.Item) bool {
 		sNodes = append(sNodes, item.(*NodeRangeStart))
@@ -86,7 +86,7 @@ func (s *Storage) FindAvail(startTS int64, endTS int64) (out []string) {
 
 	out = make([]string, 0)
 	for _, sn := range sNodes {
-		sn.Tree.AscendLessThan(&NodeRangeEnd{
+		sn.Tree.AscendGreaterOrEqual(&NodeRangeEnd{
 			EndTS: endTS,
 		}, func(item btree.Item) bool {
 			i := item.(*NodeRangeEnd)
@@ -99,16 +99,16 @@ func (s *Storage) FindAvail(startTS int64, endTS int64) (out []string) {
 
 func (s *Storage) refreshTree() error {
 	log.Print("refreshing the tree...")
-	// start building for -120 daus from now (due the dataset)
-	gStartRange := time.Now().Add(-24 * 120 * time.Hour).Unix()
-	// building for +30 days from now
-	gEndRange := time.Now().Add(24 * 30 * time.Hour).Unix()
+	// just becaue we use fixed dataset. You can use something like
+	// start from now and end now + 30 days
+	startParsed, _ := time.Parse("2006-01-02 15:04:05", "2019-09-01 00:00:00")
+	endParsed, _ := time.Parse("2006-01-02 15:04:05", "2019-12-01 23:59:59")
 
 	log.Print("extracting the data...")
 	startTSNano := time.Now().UnixNano()
 	avail, err := s.dataSource.LoadAvailability(DataSourceConf{
-		StartRangeTS: gStartRange,
-		EndRangeTS:   gEndRange,
+		StartRangeTS: startParsed.Unix(),
+		EndRangeTS:   endParsed.Unix(),
 	})
 	if err != nil {
 		return err

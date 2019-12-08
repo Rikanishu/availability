@@ -47,7 +47,7 @@ func ConvertIntoAvailDates(rs []Range, gStartTS int64, gEndTS int64) (out []Rang
 			StartTS: endTS + 1,
 		})
 	}
-	if out[len(out)-1].StartTS == gEndTS {
+	if out[len(out)-1].StartTS == (gEndTS + 1) {
 		out = out[:len(out)-1]
 	} else {
 		out[len(out)-1].EndTS = gEndTS - 1
