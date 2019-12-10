@@ -76,16 +76,11 @@ func (s *Storage) FindAvail(startTS int64, endTS int64) (out []string) {
 		return nil
 	}
 
-	sNodes := make([]*NodeRangeStart, 0)
+	out = make([]string, 0)
 	s.tree.DescendLessOrEqual(&NodeRangeStart{
 		StartTS: startTS,
 	}, func(item btree.Item) bool {
-		sNodes = append(sNodes, item.(*NodeRangeStart))
-		return true
-	})
-
-	out = make([]string, 0)
-	for _, sn := range sNodes {
+		sn := item.(*NodeRangeStart)
 		sn.Tree.AscendGreaterOrEqual(&NodeRangeEnd{
 			EndTS: endTS,
 		}, func(item btree.Item) bool {
@@ -93,7 +88,9 @@ func (s *Storage) FindAvail(startTS int64, endTS int64) (out []string) {
 			out = append(out, i.ObjectIDs...)
 			return true
 		})
-	}
+		return true
+	})
+
 	return
 }
 
